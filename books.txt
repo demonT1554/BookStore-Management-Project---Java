@@ -1,0 +1,3 @@
+B001,Java Cơ bản,Nguyễn Văn A,150000.0,1
+B002,Python Cơ bản,Trần Thị B,180000.0,10
+B003,C++ Cơ bản,Lê Văn C,120000.0,20
