@@ -50,10 +50,10 @@ public class Cart implements Serializable {
         if (quantityToRemove > currentQuantity) {
             System.out.println("Số lượng cần xóa vượt quá số lượng trong giỏ hàng.");
         } else if (quantityToRemove == currentQuantity) {
-            cartItems.remove(book); // Xóa hoàn toàn sách khỏi giỏ
+            cartItems.remove(book); 
             System.out.println("Đã xóa hoàn toàn sách " + book.getName() + " khỏi giỏ hàng.");
         } else {
-            cartItems.put(book, currentQuantity - quantityToRemove);    // Cập nhật số lượng mới
+            cartItems.put(book, currentQuantity - quantityToRemove);    
             System.out.println("Đã xóa " + quantityToRemove + " quyển sách " + book.getName() + " khỏi giỏ hàng.");
         }
         book.increaseQuantity(quantityToRemove);

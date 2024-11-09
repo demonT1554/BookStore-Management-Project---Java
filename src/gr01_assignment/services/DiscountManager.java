@@ -24,7 +24,7 @@ public class DiscountManager {
 
     public void addDiscountCode(DiscountCode discountCode) {
         discountCodes.add(discountCode);
-        saveDiscountsToFile("discounts.txt"); // Lưu ngay vào file
+        saveDiscountsToFile("discounts.txt"); 
         System.out.println("Mã giảm giá đã được thêm thành công.");
     }
 

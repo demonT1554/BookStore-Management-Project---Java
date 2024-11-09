@@ -11,14 +11,10 @@ import java.io.Serializable;
  *
  * @author Le Anh Tuan - CE180905
  */
-//Đây là lớp Book, kế thừa từ lớp Product
-//Mỗi đối tượng Book đại diện cho một cuốn sách với các thông tin cụ thể như tác giả và số lượng
 public class Book extends Product implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    // Thuộc tính lưu tên tác giả của cuốn sách
     private String author;
-    // Thuộc tính lưu số lượng của cuốn sách trong kho
     private int quantity;
 
     public Book(String productId, String name, String author, int price, int quantity) {

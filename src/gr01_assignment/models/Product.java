@@ -11,15 +11,11 @@ import java.io.Serializable;
  *
  * @author Le Anh Tuan - CE180905
  */
-//Đây là lớp trừu tượng Product, đại diện cho một sản phẩm chung
-//Các thuộc tính và phương thức trong lớp này sẽ được chia sẻ bởi các lớp con
 public class Product implements Serializable {
-    private static final long serialVersionUID = 1L; // Khuyến nghị sử dụng serialVersionUID để tránh lỗi phiên bản
-    // Thuộc tính ID của sản phẩm, bảo vệ để chỉ các lớp con có thể truy cập
+
+    private static final long serialVersionUID = 1L;
     protected String productId;
-    // Thuộc tính tên của sản phẩm, bảo vệ để chỉ các lớp con có thể truy cập        
     protected String name;
-    // Thuộc tính giá của sản phẩm, bảo vệ để chỉ các lớp con có thể truy cập
     protected int price;
 
     public Product(String productId, String name, int price) {

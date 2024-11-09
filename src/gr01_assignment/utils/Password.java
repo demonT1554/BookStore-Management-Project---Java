@@ -20,7 +20,6 @@ public class Password {
     private String ownerPassword = "admin";
     private String staffPassword = "nhanvien";
 
-    // Phương thức để đọc mật khẩu từ tệp
     public void loadPasswords(String fileName) {
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             ownerPassword = reader.readLine();
@@ -30,7 +29,6 @@ public class Password {
         }
     }
 
-    // Phương thức để lưu mật khẩu vào tệp
     public void savePasswords(String fileName) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             writer.write(ownerPassword);
@@ -40,7 +38,7 @@ public class Password {
             System.out.println("Không thể lưu mật khẩu vào file.");
         }
     }
-        // Phương thức kiểm tra mật khẩu chủ quán
+
     public String getOwnerPassword() {
         return ownerPassword;
     }

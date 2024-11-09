@@ -11,15 +11,11 @@ import java.io.Serializable;
  *
  * @author Le Anh Tuan - CE180905
  */
-//Đây là lớp Review, đại diện cho một bài đánh giá
-//Mỗi bài đánh giá chứa tên người đánh giá, nội dung bình luận và xếp hạng
 public class Review implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     private String reviewerName;
-    // Thuộc tính lưu bình luận của người đánh giá
     private String comment;
-    // Thuộc tính lưu xếp hạng của bài đánh giá (ví dụ: từ 1 đến 5 sao)
     private int rating;
 
     public Review(String reviewerName, String comment, int rating) {
