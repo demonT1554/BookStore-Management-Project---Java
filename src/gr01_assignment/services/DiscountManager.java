@@ -24,10 +24,12 @@ public class DiscountManager {
 
     public void addDiscountCode(DiscountCode discountCode) {
         discountCodes.add(discountCode);
+        saveDiscountsToFile("discounts.txt"); // Lưu ngay vào file
+        System.out.println("Mã giảm giá đã được thêm thành công.");
     }
 
     public void listDiscountCodes() {
-        System.out.println("\n--- DANH SÁCH MÃ GIẢM GIÁ ---");
+        System.out.println("\n---------- DANH SÁCH MÃ GIẢM GIÁ ----------");
         System.out.println("+------------+--------------+-------------+");
         System.out.println("| Mã         | Giảm giá     | Số lượng    |");
         System.out.println("+------------+--------------+-------------+");
@@ -38,75 +40,99 @@ public class DiscountManager {
     }
 
     public DiscountCode findDiscountCode(String code) {
-        return discountCodes.stream()
-                .filter(d -> d.getCode().equalsIgnoreCase(code))
-                .findFirst()
-                .orElse(null);
+        return discountCodes.stream().filter(d -> d.getCode().equals(code)).findFirst().orElse(null);
     }
 
-    public void updateDiscountCode(String code, double percentage, int quantity) {
+    public void updateDiscountCode(String code, int percentage, int quantity) {
+        boolean found = false;
         for (DiscountCode discount : discountCodes) {
-            if (discount.getCode().equalsIgnoreCase(code)) {
-                // Cập nhật giá trị của mã giảm giá
+            if (discount.getCode().equals(code)) {
                 discount.setDiscountPercentage(percentage);
-                System.out.println("Đã cập nhật mã giảm giá: " + code);
-                return;
-            }
-        }
-        System.out.println("Không tìm thấy mã giảm giá với mã: " + code);
-    }
-
-    public void deleteDiscountCode(String code) {
-        DiscountCode toRemove = null;
-        for (DiscountCode discount : discountCodes) {
-            if (discount.getCode().equalsIgnoreCase(code)) {
-                toRemove = discount;
+                discount.setQuantity(quantity);
+                found = true;
                 break;
             }
         }
-        if (toRemove != null) {
-            discountCodes.remove(toRemove);
-            System.out.println("Đã xóa mã giảm giá: " + code);
+        if (found) {
+            saveDiscountsToFile("discounts.txt");
+            System.out.println("Mã giảm giá đã được cập nhật.");
         } else {
-            System.out.println("Không tìm thấy mã giảm giá với mã: " + code);
+            System.out.println("Không tìm thấy mã giảm giá: " + code);
         }
     }
 
-    public void loadDiscounts(String filename) {
+    public void deleteDiscountCode(String code, int quantityToRemove) {
+        boolean found = false;
+        for (DiscountCode discount : discountCodes) {
+            if (discount.getCode().equals(code)) {
+                int currentQuantity = discount.getQuantity();
+                if (quantityToRemove > currentQuantity) {
+                    System.out.println("Số lượng mã giảm giá vượt quá số lượng trong kho. Hiện tại trong kho có " + currentQuantity + " mã.");
+                    return;
+                } else if (quantityToRemove == currentQuantity) {
+                    discountCodes.remove(discount); 
+                    System.out.println("Mã giảm giá đã bị xóa hoàn toàn khỏi kho.");
+                } else {
+                    discount.setQuantity(currentQuantity - quantityToRemove); 
+                    System.out.println("Đã xóa " + quantityToRemove + " mã giảm giá. Số lượng còn lại: " + (currentQuantity - quantityToRemove));
+                }
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            System.out.println("Không tìm thấy mã giảm giá: " + code);
+        }
+        saveDiscountsToFile("discounts.txt");
+    }
+
+    public void loadDiscountsFromFile(String fileName) {
         discountCodes.clear();
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
-            while ((line = br.readLine()) != null) {
+            while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
                 if (parts.length == 3) {
-                    String code = parts[0].trim();
-                    double percentage = Double.parseDouble(parts[1].trim()) / 100; // Chuyển từ phần trăm sang hệ số
-                    int quantity = Integer.parseInt(parts[2].trim());
+                    String code = parts[0];
+                    int percentage = Integer.parseInt(parts[1]);
+                    int quantity = Integer.parseInt(parts[2]);
                     discountCodes.add(new DiscountCode(code, percentage, quantity));
                 }
             }
-            //System.out.println("Discounts loaded successfully.");
         } catch (IOException e) {
-            System.out.println("Error loading discounts: " + e.getMessage());
+            System.out.println("Lỗi khi đọc dữ liệu mã giảm giá: " + e.getMessage());
         }
     }
 
-    public void saveDiscounts(String filename) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename))) {
-            for (DiscountCode discountCode : discountCodes) {
-                // Lưu dưới dạng "mã,tỷ lệ phần trăm,số lượng"
-                bw.write(discountCode.getCode() + ","
-                        + (int) (discountCode.getDiscountPercentage() * 100) + ","
-                        + discountCode.getQuantity());
-                bw.newLine();
+    public void saveDiscountsToFile(String fileName) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            for (DiscountCode discount : discountCodes) {
+                writer.write(String.format("%s,%d,%d",
+                        discount.getCode(),
+                        discount.getDiscountPercentage(),
+                        discount.getQuantity()));
+                writer.newLine();
             }
-            //System.out.println("Discounts saved successfully.");
         } catch (IOException e) {
-            System.out.println("Error saving discounts: " + e.getMessage());
+            System.out.println("Lỗi khi ghi dữ liệu mã giảm giá: " + e.getMessage());
         }
     }
 
-    public void removeDiscountCode(String code) {
-        discountCodes.removeIf(discountCode -> discountCode.getCode().equalsIgnoreCase(code));
+    public boolean applyDiscountAndReduceQuantity(String code) {
+        DiscountCode discount = findDiscountCode(code);
+        if (discount != null && discount.getQuantity() > 0) {
+            if (discount.getQuantity() == 1) {
+                discountCodes.remove(discount);
+            } else {
+                discount.setQuantity(discount.getQuantity() - 1);
+            }
+            saveDiscountsToFile("discounts.txt");
+            System.out.println("Đã áp dụng mã giảm giá: " + code);
+            return true;
+        } else {
+            System.out.println("Mã giảm giá không hợp lệ hoặc đã hết số lượng.");
+            return false;
+        }
     }
+
 }

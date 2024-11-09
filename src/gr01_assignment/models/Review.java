@@ -5,14 +5,21 @@
  */
 package gr01_assignment.models;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Le Anh Tuan - CE180905
  */
-public class Review {
+//Đây là lớp Review, đại diện cho một bài đánh giá
+//Mỗi bài đánh giá chứa tên người đánh giá, nội dung bình luận và xếp hạng
+public class Review implements Serializable {
     
+    private static final long serialVersionUID = 1L;
     private String reviewerName;
+    // Thuộc tính lưu bình luận của người đánh giá
     private String comment;
+    // Thuộc tính lưu xếp hạng của bài đánh giá (ví dụ: từ 1 đến 5 sao)
     private int rating;
 
     public Review(String reviewerName, String comment, int rating) {
@@ -45,13 +52,10 @@ public class Review {
         this.rating = rating;
     }
 
-    
-    
+    //Ghi đè phương thức toString để trả về thông tin của bài đánh giá theo định dạng chuỗi
     @Override
     public String toString() {
-        return reviewerName + "," + rating + "," + comment;
+        // Định dạng chuỗi với tên người đánh giá, xếp hạng và bình luận
+        return "Tên người đánh giá: " + reviewerName + "\nBình luận: " + comment + "\nĐiểm: " + rating;
     }
-    
-    
-    
 }

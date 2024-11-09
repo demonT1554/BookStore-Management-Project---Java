@@ -5,21 +5,26 @@
  */
 package gr01_assignment.models;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
  *
  * @author Le Anh Tuan - CE180905
  */
-public class Order {
+//Đây là lớp Order, đại diện cho một đơn đặt hàng
+//Đơn hàng chứa thông tin khách hàng, các mặt hàng đã mua và tổng số tiền
+public class Order implements Serializable {
 
-    private String customerName;
-    private Map<Book, Integer> purchasedItems;
-    private double totalAmount;
+    private static final long serialVersionUID = 1L;
 
-    public Order(String customerName, Map<Book, Integer> purchasedItems, double totalAmount) {
+    private String customerName; // Tên khách hàng
+    private Map<Book, Integer> items; // Danh sách sách và số lượng mua
+    private int totalAmount; // Tổng giá trị đơn hàng (lưu dưới dạng int để nhất quán)
+
+    public Order(String customerName, Map<Book, Integer> items, int totalAmount) {
         this.customerName = customerName;
-        this.purchasedItems = purchasedItems;
+        this.items = items;
         this.totalAmount = totalAmount;
     }
 
@@ -31,28 +36,31 @@ public class Order {
         this.customerName = customerName;
     }
 
-    public Map<Book, Integer> getPurchasedItems() {
-        return purchasedItems;
+    public Map<Book, Integer> getItems() {
+        return items;
     }
 
-    public void setPurchasedItems(Map<Book, Integer> purchasedItems) {
-        this.purchasedItems = purchasedItems;
+    public void setPurchasedItems(Map<Book, Integer> getItems) {
+        this.items = items;
     }
 
-    public double getTotalAmount() {
+    public int getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(double totalAmount) {
+    public void setTotalAmount(int totalAmount) {
         this.totalAmount = totalAmount;
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("Khách hàng:  ").append(customerName)
-                .append("\nTổng số tiền: ").append(String.format("%.0f VND", totalAmount)).append("\nMặt hàng đã mua:\n");
-        purchasedItems.forEach((book, qty) -> sb.append(book.getName()).append("\nSố lượng: ").append(qty).append("\n"));
+        StringBuilder sb = new StringBuilder("Khách hàng: ")
+                .append(customerName) 
+                .append("\nTổng tiền: ").append(totalAmount).append(" VND") 
+                .append("\nDanh sách mặt hàng:\n");
+        items.forEach((book, qty) -> sb
+                .append("- ").append(book.getName()).append(" (Số lượng: ").append(qty).append(", Giá: ").append(book.getPrice()).append(" VND)\n")
+        );
         return sb.toString();
     }
-
 }

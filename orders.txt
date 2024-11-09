@@ -1,0 +1,15 @@
+AnhTuan,77500
+Java,155000,1
+
+Tuan,155000
+Java,155000,1
+
+AnhTuna,540000
+C++,120000,5
+
+Tuan,900000
+Python,200000,5
+
+AnhTuannn,3520000
+Python,200000,20
+

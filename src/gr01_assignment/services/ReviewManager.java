@@ -23,74 +23,91 @@ import java.util.Scanner;
 public class ReviewManager {
 
     private List<Review> reviews = new ArrayList<>();
-    private boolean allowReview = false;
 
     public void addReview(Review review) {
         reviews.add(review);
+        saveReviewsToFile("reviews.txt");
+        System.out.println("Đánh giá đã được thêm thành công.\n");
     }
 
-    public void loadReviews(String filename) {
+    public void loadReviewsFromFile(String fileName) {
         reviews.clear();
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
-            while ((line = br.readLine()) != null) {
+            while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
                 if (parts.length == 3) {
                     String reviewerName = parts[0];
-                    int rating = Integer.parseInt(parts[1]);
-                    String comment = parts[2];
-                    reviews.add(new Review(reviewerName, comment, rating));
+                    String comment = parts[1];
+                    int rating = Integer.parseInt(parts[2]);
+                    Review review = new Review(reviewerName, comment, rating);
+                    reviews.add(review);
                 }
             }
-            //System.out.println("Reviews sloaded successfully.");
         } catch (IOException e) {
-            System.out.println("Error loading reviews: " + e.getMessage());
+            System.out.println("Lỗi khi đọc dữ liệu đánh giá: " + e.getMessage());
         }
     }
 
-    public void saveReviews(String filename) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename))) {
+    public void saveReviewsToFile(String fileName) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             for (Review review : reviews) {
-                bw.write(review.toString());
-                bw.newLine();
+                writer.write(String.format("%s,%s,%d",
+                        review.getReviewerName(),
+                        review.getComment(),
+                        review.getRating()));
+                writer.newLine();
             }
-            //System.out.println("Reviews saved successfully.");
         } catch (IOException e) {
-            System.out.println("Error saving reviews: " + e.getMessage());
+            System.out.println("Lỗi khi ghi dữ liệu đánh giá: " + e.getMessage());
         }
     }
 
-    // Hiển thị danh sách đánh giá
     public void displayReviews() {
         if (reviews.isEmpty()) {
-            System.out.println("Chưa có đánh giá nào cho cửa hàng.");
+            System.out.println("Chưa có đánh giá nào.");
         } else {
             System.out.println("\n--- DANH SÁCH ĐÁNH GIÁ ---");
             for (Review review : reviews) {
-                System.out.println(review.toString());
-                System.out.println("----------------------------");
+                System.out.println(review);
+                System.out.println("--------------------------");
             }
         }
     }
 
-    public void rateStore(Scanner scanner, String customerName) {
-        if (!allowReview) {
-            System.out.println("Bạn cần hoàn tất thanh toán trước khi đánh giá cửa hàng.");
-            return;
-        }
-
+    public void addReviewFromCustomer(Scanner scanner, String reviewerName) {
         int rating = InputValidator.getPositiveIntRange("Nhập đánh giá của bạn (1 đến 5): ");
         String comment = InputValidator.getStringInput("Nhập bình luận: ");
 
-        reviews.add(new Review(customerName, comment, rating));
-        System.out.println("Cảm ơn " + customerName + " đã để lại đánh giá!");
+        Review newReview = new Review(reviewerName, comment, rating);
+        addReview(newReview); 
+        System.out.println("Cảm ơn " + reviewerName + " đã để lại đánh giá!\n");
     }
 
     public List<Review> getReviews() {
         return reviews;
     }
 
-    public void setAllowReview(boolean allow) {
-        this.allowReview = allow;
+    public void removeReviewByReviewer(String reviewerName) {
+        boolean removed = reviews.removeIf(review -> review.getReviewerName().equalsIgnoreCase(reviewerName));
+        if (removed) {
+            saveReviewsToFile("reviews.txt");
+            System.out.println("Đánh giá của " + reviewerName + " đã được xóa.");
+        } else {
+            System.out.println("Không tìm thấy đánh giá của " + reviewerName + ".");
+        }
+    }
+
+    public void updateReview(String reviewerName, int newRating, String newComment) {
+        for (Review review : reviews) {
+            if (review.getReviewerName().equalsIgnoreCase(reviewerName)) {
+                review.setRating(newRating);
+                review.setComment(newComment);
+                saveReviewsToFile("reviews.txt"); 
+                System.out.println("Đánh giá của " + reviewerName + " đã được cập nhật.");
+                return;
+            }
+        }
+        System.out.println("Không tìm thấy đánh giá của " + reviewerName + ".");
     }
 }

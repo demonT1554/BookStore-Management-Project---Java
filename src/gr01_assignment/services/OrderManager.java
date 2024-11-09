@@ -23,72 +23,83 @@ import java.util.Map;
  */
 public class OrderManager {
 
-    private final List<Order> orders = new ArrayList<>();
+    private final List<Order> orderHistory = new ArrayList<>();
 
-    public void addOrder(Order order) {
-        orders.add(order);
+    public void addOrder(Order order, String filename) {
+        orderHistory.add(order);
+        saveOrdersToFile(filename);
     }
 
-    public void loadOrders(String filename) {
-        orders.clear();
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+    public void loadOrdersFromFile(String filePath) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split(";");
-                if (parts.length < 3) {
+            String customerName = null;
+            int totalAmount = 0;
+            Map<Book, Integer> items = new HashMap<>();
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) {
+                    if (customerName != null) {
+                        orderHistory.add(new Order(customerName, items, totalAmount));
+                    }
+                    customerName = null;
+                    items = new HashMap<>();
                     continue;
                 }
-
-                String customerName = parts[0];
-                double totalAmount = Double.parseDouble(parts[1]);
-                Map<Book, Integer> purchasedItems = new HashMap<>();
-
-                for (int i = 2; i < parts.length; i += 3) {
-                    String productId = parts[i];
-                    String bookName = parts[i + 1];
-                    int quantity = Integer.parseInt(parts[i + 2]);
-                    Book book = new Book(productId, bookName, "", 0, quantity);
-                    purchasedItems.put(book, quantity);
+                if (customerName == null) {
+                    String[] parts = line.split(",");
+                    customerName = parts[0].trim();
+                    totalAmount = Integer.parseInt(parts[1].trim());
+                } else {
+                    String[] parts = line.split(",");
+                    String name = parts[0].trim();
+                    int price = Integer.parseInt(parts[1].trim());
+                    int quantity = Integer.parseInt(parts[2].trim());
+                    Book book = new Book("TEMP_ID", name, "UNKNOWN_AUTHOR", price, quantity);
+                    items.put(book, quantity);
                 }
-
-                orders.add(new Order(customerName, purchasedItems, totalAmount));
             }
-            //ystem.out.println("Orders loaded successfully.");
+            if (customerName != null) {
+                orderHistory.add(new Order(customerName, items, totalAmount));
+            }
         } catch (IOException e) {
-            System.out.println("Error loading orders: " + e.getMessage());
+            System.out.println("Lỗi khi đọc dữ liệu đơn hàng: " + e.getMessage());
         }
     }
 
-    public void saveOrders(String filename) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename))) {
-            for (Order order : orders) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(order.getCustomerName()).append(";").append(order.getTotalAmount()).append(";");
-                for (Map.Entry<Book, Integer> entry : order.getPurchasedItems().entrySet()) {
+    public void saveOrdersToFile(String fileName) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            for (Order order : orderHistory) {
+                // Ghi tên khách hàng và tổng tiền
+                writer.write(order.getCustomerName() + "," + order.getTotalAmount());
+                writer.newLine();
+                // Ghi danh sách sách đã mua
+                for (Map.Entry<Book, Integer> entry : order.getItems().entrySet()) {
                     Book book = entry.getKey();
                     int quantity = entry.getValue();
-                    sb.append(book.getProductId()).append(";").append(book.getName()).append(";").append(quantity).append(";");
+                    writer.write(book.getName() + "," + book.getPrice() + "," + quantity);
+                    writer.newLine();
                 }
-                bw.write(sb.toString());
-                bw.newLine();
+                writer.newLine(); // Thêm dòng trống giữa các đơn hàng
             }
-            //System.out.println("Orders saved successfully.");
         } catch (IOException e) {
-            System.out.println("Error saving orders: " + e.getMessage());
+            System.out.println("Lỗi khi ghi dữ liệu đơn hàng: " + e.getMessage());
         }
-    }
-
-    public List<Order> getOrders() {
-        return orders;
     }
 
     public void displayOrderHistory() {
-        if (orders.isEmpty()) {
+        if (orderHistory.isEmpty()) {
             System.out.println("\nChưa có lịch sử mua hàng.");
         } else {
             System.out.println("\n--- LỊCH SỬ MUA HÀNG ---");
-            for (Order order : orders) {
-                System.out.print(order);
+            for (Order order : orderHistory) {
+                System.out.println("Khách hàng: " + order.getCustomerName());
+                System.out.println("Tổng tiền: " + order.getTotalAmount());
+                System.out.println("Danh sách sách:");
+                for (Map.Entry<Book, Integer> entry : order.getItems().entrySet()) {
+                    Book book = entry.getKey();
+                    int quantity = entry.getValue();
+                    System.out.printf(" - %s (Số lượng: %d, Giá: %d)\n", book.getName(), quantity, book.getPrice());
+                }
                 System.out.println("--------------------------\n");
             }
         }

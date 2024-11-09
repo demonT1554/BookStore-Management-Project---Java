@@ -5,17 +5,20 @@
  */
 package gr01_assignment.models;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Le Anh Tuan - CE180905
  */
-public class DiscountCode {
+public class DiscountCode implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private String code;
-    private double discountPercentage;
+    private int discountPercentage;
     private int quantity;
 
-    public DiscountCode(String code, double discountPercentage, int quantily) {
+    public DiscountCode(String code, int discountPercentage, int quantity) {
         this.code = code;
         this.discountPercentage = discountPercentage;
         this.quantity = quantity;
@@ -29,11 +32,11 @@ public class DiscountCode {
         this.code = code;
     }
 
-    public double getDiscountPercentage() {
+    public int getDiscountPercentage() {
         return discountPercentage;
     }
 
-    public void setDiscountPercentage(double discountPercentage) {
+    public void setDiscountPercentage(int discountPercentage) {
         this.discountPercentage = discountPercentage;
     }
 
@@ -44,14 +47,12 @@ public class DiscountCode {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
-    
-    
 
     @Override
     public String toString() {
-        return String.format("| %-10s | %-11.0f%% | %11d |",
+        return String.format("| %-10s | %-11d%% | %-11d |",
                 code,
-                discountPercentage * 100,
+                discountPercentage,
                 quantity
         );
     }
